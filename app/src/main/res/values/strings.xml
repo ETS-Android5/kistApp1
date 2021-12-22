@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">KIST APP 1</string>
+<<<<<<< HEAD
+    <string name="tfe_od_app_name" translation_description="Object Detection app">TFL Detect</string>
+    <string name="tfe_od_camera_error" translation_description="Error regarding camera support[CHAR_LIMIT=40]">This device doesn\'t support Camera2 API.</string>
+=======
+>>>>>>> 368c839c7c3f3b692964c135cace4e36f537832e
+</resources>

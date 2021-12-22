@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:background="@color/black">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="276dp"
+        android:layout_marginTop="140dp"
+        android:text="이동하기"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="330dp"
+        android:layout_height="496dp"
+        android:layout_marginStart="168dp"
+        android:layout_marginTop="48dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+<<<<<<< HEAD
+
+=======
+>>>>>>> 368c839c7c3f3b692964c135cace4e36f537832e
+    <ImageView
+        android:id="@+id/faceView"
+        android:layout_width="402dp"
+        android:layout_height="203dp"
+        android:layout_marginTop="140dp"
+        android:layout_marginEnd="148dp"
+        android:src="@drawable/faceiiid"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/funcTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+<<<<<<< HEAD
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="292dp"
+        android:text="각종 기능"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        android:textStyle="bold"
+=======
+        android:layout_marginTop="60dp"
+        android:layout_marginEnd="292dp"
+        android:text="각종 기능"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+>>>>>>> 368c839c7c3f3b692964c135cace4e36f537832e
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/faceView" />
+
+    <Button
+        android:id="@+id/callSeungwonBtn"
+        android:layout_width="200sp"
+        android:layout_height="wrap_content"
+<<<<<<< HEAD
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="396dp"
+=======
+        android:layout_marginTop="36dp"
+        android:layout_marginEnd="248dp"
+>>>>>>> 368c839c7c3f3b692964c135cace4e36f537832e
+        android:text="유승원한테 전화걸기"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/funcTextView" />
+
+    <Button
+        android:id="@+id/followMeBtn"
+        android:layout_width="200sp"
+        android:layout_height="wrap_content"
+<<<<<<< HEAD
+        android:layout_marginEnd="396dp"
+=======
+        android:layout_marginEnd="248dp"
+>>>>>>> 368c839c7c3f3b692964c135cace4e36f537832e
+        android:text="따라와"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/callSeungwonBtn" />
+
+    <Button
+        android:id="@+id/showTopBarBtn"
+        android:layout_width="200sp"
+        android:layout_height="wrap_content"
+<<<<<<< HEAD
+        android:layout_marginEnd="396dp"
+=======
+        android:layout_marginEnd="248dp"
+>>>>>>> 368c839c7c3f3b692964c135cace4e36f537832e
+        android:text="상단바 보이기"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/followMeBtn" />
+
+    <Button
+        android:id="@+id/faceStartBtn"
+        android:layout_width="200sp"
+        android:layout_height="wrap_content"
+<<<<<<< HEAD
+        android:layout_marginEnd="396dp"
+=======
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="248dp"
+>>>>>>> 368c839c7c3f3b692964c135cace4e36f537832e
+        android:text="얼굴인식 시작"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/showTopBarBtn" />
+
+    <Button
+        android:id="@+id/faceStopBtn"
+        android:layout_width="200sp"
+        android:layout_height="wrap_content"
+<<<<<<< HEAD
+        android:layout_marginEnd="396dp"
+        android:text="얼굴인식 종료"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/faceStartBtn" />
+
+    <Button
+        android:id="@+id/humanDtStartBtn"
+        android:layout_width="200sp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="152dp"
+        android:text="사람탐지 시작"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/funcTextView" />
+=======
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="248dp"
+        android:text="얼굴인식 종료"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/showTopBarBtn" />
+>>>>>>> 368c839c7c3f3b692964c135cace4e36f537832e
+
+    <Button
+        android:id="@+id/changeAppBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="596dp"
+        android:layout_marginTop="64dp"
+        android:text="앱 전환"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/kioskBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="KIOSK MODE ON"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+<<<<<<< HEAD
+=======
+    <!--    <Button-->
+<!--        android:id="@+id/button"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="request"-->
+<!--        app:layout_constraintLeft_toLeftOf="parent"-->
+<!--        app:layout_constraintRight_toRightOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        tools:layout_editor_absoluteX="5dp"-->
+<!--        tools:layout_editor_absoluteY="673dp" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/button2"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="50dp"-->
+<!--        android:text="over"-->
+<!--        app:layout_constraintLeft_toLeftOf="parent"-->
+<!--        app:layout_constraintRight_toRightOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        tools:layout_editor_absoluteX="292dp"-->
+<!--        tools:layout_editor_absoluteY="666dp" />-->
+
+>>>>>>> 368c839c7c3f3b692964c135cace4e36f537832e
+</androidx.constraintlayout.widget.ConstraintLayout>
