@@ -43,14 +43,11 @@ repositories {
 
 dependencies {
     // temi robot
-    implementation 'com.robotemi:sdk:0.10.77'
+    implementation 'com.robotemi:sdk:0.10.78'
 
-<<<<<<< HEAD
-    implementation 'org.tensorflow:tensorflow-lite:2.2.0'
-    implementation 'org.tensorflow:tensorflow-lite-gpu:2.2.0'
+    implementation 'org.tensorflow:tensorflow-lite:2.4.0'
+    implementation 'org.tensorflow:tensorflow-lite-gpu:2.3.0'
 
-=======
->>>>>>> 368c839c7c3f3b692964c135cace4e36f537832e
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.2.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'

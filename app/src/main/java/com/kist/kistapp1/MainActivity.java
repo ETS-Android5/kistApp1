@@ -8,10 +8,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-<<<<<<< HEAD
-=======
-import android.content.IntentFilter;
->>>>>>> 368c839c7c3f3b692964c135cace4e36f537832e
+
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
@@ -30,10 +27,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 
-<<<<<<< HEAD
+
 import com.kist.Detection.humanDetection.DetectorActivity;
-=======
->>>>>>> 368c839c7c3f3b692964c135cace4e36f537832e
 import com.kist.listView.LocationAdapter;
 import com.kist.listView.LocationData;
 import com.robotemi.sdk.Robot;
@@ -49,19 +44,10 @@ import com.robotemi.sdk.permission.Permission;
 
 import org.jetbrains.annotations.NotNull;
 
-<<<<<<< HEAD
-=======
-import java.io.File;
-import java.io.FileNotFoundException;
->>>>>>> 368c839c7c3f3b692964c135cace4e36f537832e
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-<<<<<<< HEAD
-=======
-import java.util.Scanner;
->>>>>>> 368c839c7c3f3b692964c135cace4e36f537832e
 
 import kotlin.collections.CollectionsKt;
 import kotlin.text.StringsKt;
@@ -74,12 +60,9 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     private static final int REQUEST_CAMERA = 1;
 
-<<<<<<< HEAD
     // Human detection
     public static final float MINIMUM_CONFIDENCE_TF_OD_API = 0.5f;
 
-=======
->>>>>>> 368c839c7c3f3b692964c135cace4e36f537832e
     //필요한 퍼미션
     private static final String[] PERMISSIONS_STORAGE = {
             Manifest.permission.INTERNET,
@@ -180,38 +163,29 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
 
         // 상단바 표시
         Button showTopBarBtn = (Button) findViewById(R.id.showTopBarBtn);
-        showTopBarBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                robot.showTopBar();
-            }
-        });
+        showTopBarBtn.setOnClickListener(view -> robot.showTopBar());
 
         // 얼굴인식
         imageViewFace = (ImageView)findViewById(R.id.faceView);
 
         Button startFaceRecogBtn = (Button) findViewById(R.id.faceStartBtn);
-        startFaceRecogBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startFaceRecognition();
-            }
-        });
+        startFaceRecogBtn.setOnClickListener(view -> startFaceRecognition());
 
         Button stopFaceRecogBtn = (Button) findViewById(R.id.faceStopBtn);
-        stopFaceRecogBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                stopFaceRecognition();
-            }
-        });
+        stopFaceRecogBtn.setOnClickListener(view -> stopFaceRecognition());
 
-<<<<<<< HEAD
         Button humanDetectionStartBtn = (Button)findViewById(R.id.humanDtStartBtn);
         humanDetectionStartBtn.setOnClickListener(view -> startActivity(new Intent(MainActivity.this, DetectorActivity.class)));
 
-=======
->>>>>>> 368c839c7c3f3b692964c135cace4e36f537832e
+        // 순찰 기능
+        Button patrolBtn = (Button)findViewById(R.id.patrolBtn);
+        patrolBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                robot.playSequence(robot.getAllSequences().get(0).getId());
+            }
+        });
+
         // 키오스크 모드 시작
         Button kioskBtn = (Button)findViewById(R.id.kioskBtn);
         kioskBtn.setOnClickListener(new View.OnClickListener() {
