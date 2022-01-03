@@ -388,6 +388,7 @@ public abstract class HumanCameraActivity extends AppCompatActivity
     }
   }
 
+
   protected abstract void processImage();
 
   protected abstract void onPreviewSizeChosen(final Size size, final int rotation);

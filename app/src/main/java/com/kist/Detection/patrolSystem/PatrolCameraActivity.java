@@ -64,7 +64,7 @@ public abstract class PatrolCameraActivity extends AppCompatActivity
     protected int previewWidth = 0;
     protected int previewHeight = 0;
     private boolean debug = false;
-    private Handler handler;
+    protected Handler handler;
     private HandlerThread handlerThread;
     private boolean isProcessingFrame = false;
     private byte[][] yuvBytes = new byte[3][];
@@ -72,6 +72,8 @@ public abstract class PatrolCameraActivity extends AppCompatActivity
     private int yRowStride;
     private Runnable postInferenceCallback;
     private Runnable imageConverter;
+
+    protected Fragment fragment;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -335,7 +337,6 @@ public abstract class PatrolCameraActivity extends AppCompatActivity
     protected void setFragment() {
         String cameraId = chooseCamera();
 
-        Fragment fragment;
         CameraConnectionFragment camera2Fragment =
                 CameraConnectionFragment.newInstance(
                         (size, rotation) -> {

@@ -25,6 +25,7 @@ import com.kist.Detection.env.BorderedText;
 import com.kist.Detection.env.ImageUtils;
 import com.kist.Detection.env.Logger;
 import com.kist.Detection.faceRecognition.FaceCameraActivity;
+import com.kist.Detection.faceRecognition.FaceRecognitionActivity;
 import com.kist.Detection.humanDetection.HumanCameraActivity;
 import com.kist.Detection.tflite.Classifier;
 import com.kist.Detection.tflite.YoloV4Classifier;
@@ -37,7 +38,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class PatrolActivity extends HumanCameraActivity
+public class PatrolActivity extends PatrolCameraActivity
         // implements OnRobotReadyListener, OnGoToLocationStatusChangedListener {
 {
 
@@ -162,42 +163,48 @@ public class PatrolActivity extends HumanCameraActivity
                 if (results.size() >= 1){
                     // 거수자 발생 알림!!
                     // 얼굴 인식 액티비티로 이동 -> 이거 왜 안돼 ㅠ
-                    Intent mIntent = new Intent(PatrolActivity.this, FaceCameraActivity.class);
+                    // getFragmentManager().beginTransaction().remove(fragment).commit();
+
+                    getFragmentManager().beginTransaction().remove(fragment).commit();
+                    Intent mIntent = new Intent(PatrolActivity.this, FaceRecognitionActivity.class);
                     mIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(mIntent);
-                }
+                    Log.d("PatrolActivity : ","start FaceRecognitionActivity");
+                    finish();
+                }else {
 
-                lastProcessingTimeMs = SystemClock.uptimeMillis() - startTime;
+                    lastProcessingTimeMs = SystemClock.uptimeMillis() - startTime;
 
-                Log.e("CHECK", "run: " + results.size());
+                    Log.e("CHECK", "run: " + results.size());
 
-                cropCopyBitmap = Bitmap.createBitmap(croppedBitmap);
-                final Canvas canvas1 = new Canvas(cropCopyBitmap);
-                final Paint paint = new Paint();
-                paint.setColor(Color.RED);
-                paint.setStyle(Paint.Style.STROKE);
-                paint.setStrokeWidth(2.0f);
+                    cropCopyBitmap = Bitmap.createBitmap(croppedBitmap);
+                    final Canvas canvas1 = new Canvas(cropCopyBitmap);
+                    final Paint paint = new Paint();
+                    paint.setColor(Color.RED);
+                    paint.setStyle(Paint.Style.STROKE);
+                    paint.setStrokeWidth(2.0f);
 
-                final List<Classifier.Recognition> mappedRecognitions =
-                        new LinkedList<Classifier.Recognition>();
+                    final List<Classifier.Recognition> mappedRecognitions =
+                            new LinkedList<Classifier.Recognition>();
 
-                for (final Classifier.Recognition result : results) {
-                    final RectF location = result.getLocation();
-                    if (location != null && result.getConfidence() >= MINIMUM_CONFIDENCE_TF_OD_API) {
-                        canvas1.drawRect(location, paint);
+                    for (final Classifier.Recognition result : results) {
+                        final RectF location = result.getLocation();
+                        if (location != null && result.getConfidence() >= MINIMUM_CONFIDENCE_TF_OD_API) {
+                            canvas1.drawRect(location, paint);
 
-                        cropToFrameTransform.mapRect(location);
+                            cropToFrameTransform.mapRect(location);
 
-                        result.setLocation(location);
-                        mappedRecognitions.add(result);
+                            result.setLocation(location);
+                            mappedRecognitions.add(result);
+                        }
                     }
+
+                    tracker.trackResults(mappedRecognitions, currTimestamp);
+                    trackingOverlay.postInvalidate();
+
+                    computingDetection = false;
+                    handler.postDelayed(this, 1000);
                 }
-
-                tracker.trackResults(mappedRecognitions, currTimestamp);
-                trackingOverlay.postInvalidate();
-
-                computingDetection = false;
-                handler.postDelayed(this,1000);
             }
         };
         runInBackground(runnable);
