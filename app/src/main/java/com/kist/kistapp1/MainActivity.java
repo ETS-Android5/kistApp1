@@ -28,7 +28,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 
-import com.kist.Detection.humanDetection.DetectorActivity;
+import com.kist.Detection.humanDetection.HumanDetectorActivity;
+import com.kist.Detection.patrolSystem.PatrolActivity;
 import com.kist.listView.LocationAdapter;
 import com.kist.listView.LocationData;
 import com.robotemi.sdk.Robot;
@@ -175,14 +176,14 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
         stopFaceRecogBtn.setOnClickListener(view -> stopFaceRecognition());
 
         Button humanDetectionStartBtn = (Button)findViewById(R.id.humanDtStartBtn);
-        humanDetectionStartBtn.setOnClickListener(view -> startActivity(new Intent(MainActivity.this, DetectorActivity.class)));
+        humanDetectionStartBtn.setOnClickListener(view -> startActivity(new Intent(MainActivity.this, HumanDetectorActivity.class)));
 
         // 순찰 기능
         Button patrolBtn = (Button)findViewById(R.id.patrolBtn);
         patrolBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                robot.playSequence(robot.getAllSequences().get(0).getId());
+                startActivity(new Intent(MainActivity.this, PatrolActivity.class));
             }
         });
 
@@ -239,6 +240,7 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
         robot.requestPermissions(p,1);
         // robot.requestToBeKioskApp();
         robot.toggleWakeup(true);
+        robot.toggleNavigationBillboard(true);
         InitializeLocationData();
         ListView listView = (ListView)findViewById(R.id.listView);
         final LocationAdapter locationAdapter = new LocationAdapter(this, locationDataList);

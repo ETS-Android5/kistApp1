@@ -38,7 +38,7 @@ public class ModuleManager {
 
     moduleTemi moduleTemi;
 
-    ModuleManager(AppCompatActivity mainApp) {
+    public ModuleManager(AppCompatActivity mainApp) {
 
         m_moduleManager = this;
         m_mainAppActivity = mainApp;
