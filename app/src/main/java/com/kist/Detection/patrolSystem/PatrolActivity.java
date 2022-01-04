@@ -166,10 +166,10 @@ public class PatrolActivity extends PatrolCameraActivity
                     // getFragmentManager().beginTransaction().remove(fragment).commit();
 
                     getFragmentManager().beginTransaction().remove(fragment).commit();
-                    Intent mIntent = new Intent(PatrolActivity.this, FaceRecognitionActivity.class);
-                    mIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(mIntent);
-                    Log.d("PatrolActivity : ","start FaceRecognitionActivity");
+                    // Intent mIntent = new Intent(PatrolActivity.this, FaceRecognitionActivity.class);
+                    // mIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    // startActivity(mIntent);
+                    // Log.d("PatrolActivity : ","start FaceRecognitionActivity");
                     finish();
                 }else {
 
@@ -203,7 +203,7 @@ public class PatrolActivity extends PatrolCameraActivity
                     trackingOverlay.postInvalidate();
 
                     computingDetection = false;
-                    handler.postDelayed(this, 1000);
+                    // handler.postDelayed(this, 1000);
                 }
             }
         };
@@ -288,6 +288,11 @@ public class PatrolActivity extends PatrolCameraActivity
     @Override
     protected Size getDesiredPreviewFrameSize() {
         return DESIRED_PREVIEW_SIZE;
+    }
+
+    @Override
+    public synchronized void onDestroy() {
+        super.onDestroy();
     }
 
     @Override

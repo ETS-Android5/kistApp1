@@ -337,8 +337,8 @@ public abstract class PatrolCameraActivity extends AppCompatActivity
     protected void setFragment() {
         String cameraId = chooseCamera();
 
-        CameraConnectionFragment camera2Fragment =
-                CameraConnectionFragment.newInstance(
+        PatrolCameraConnectionFragment camera2Fragment =
+                PatrolCameraConnectionFragment.newInstance(
                         (size, rotation) -> {
                             previewHeight = size.getHeight();
                             previewWidth = size.getWidth();

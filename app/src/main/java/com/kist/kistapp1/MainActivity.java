@@ -17,6 +17,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -28,6 +30,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 
+import com.kist.Detection.faceRecognition.FaceRecognitionActivity;
 import com.kist.Detection.humanDetection.HumanDetectorActivity;
 import com.kist.Detection.patrolSystem.PatrolActivity;
 import com.kist.listView.LocationAdapter;
@@ -55,12 +58,17 @@ import kotlin.text.StringsKt;
 
 public class MainActivity extends AppCompatActivity implements OnRobotReadyListener, OnFaceRecognizedListener, OnContinuousFaceRecognizedListener, OnLocationsUpdatedListener, OnGoToLocationStatusChangedListener {
     Robot robot;
+    MediaPlayer mediaPlayer;
     ImageView imageViewFace;
     ArrayList<LocationData> locationDataList;
     ModuleManager m_moduleManager = new ModuleManager(this);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Handler handler;
+    HandlerThread handlerThread;
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     private static final int REQUEST_CAMERA = 1;
 
+    private static boolean faceDetectionOn = false;
     // Human detection
     public static final float MINIMUM_CONFIDENCE_TF_OD_API = 0.5f;
 
@@ -149,6 +157,7 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
         robot.addOnLocationsUpdatedListener(this);
         robot.addOnGoToLocationStatusChangedListener(this);
 
+
         // 영상통화 걸기
         Button callSeungwonBtn = (Button)findViewById(R.id.callSeungwonBtn);
         callOwnerBtn(callSeungwonBtn,"유승원한테 전화 걸기.");
@@ -183,6 +192,7 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
         patrolBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                faceDetectionOn = true;
                 startActivity(new Intent(MainActivity.this, PatrolActivity.class));
             }
         });
@@ -231,6 +241,44 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
             }
         }
         return super.dispatchTouchEvent(event);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        handlerThread = new HandlerThread("mp3 player");
+        handlerThread.start();
+        handler = new Handler(handlerThread.getLooper());
+        if(faceDetectionOn) {
+            handler.post(() -> {
+                faceDetectionOn = false;
+                mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.human_detection);
+                mediaPlayer.start();
+                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mediaPlayer) {
+                        mediaPlayer = null;
+                    }
+                });
+            });
+            Intent mIntent = new Intent(MainActivity.this, FaceRecognitionActivity.class);
+            mIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(mIntent);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        handlerThread.quitSafely();
+        try {
+            handlerThread.join();
+            handlerThread = null;
+            handler = null;
+        } catch (final InterruptedException e) {
+            Log.e("e","exception!");
+        }
+
+        super.onPause();
     }
 
     @Override
