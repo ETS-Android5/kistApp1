@@ -57,6 +57,7 @@ import kotlin.collections.CollectionsKt;
 import kotlin.text.StringsKt;
 
 public class MainActivity extends AppCompatActivity implements OnRobotReadyListener, OnFaceRecognizedListener, OnContinuousFaceRecognizedListener, OnLocationsUpdatedListener, OnGoToLocationStatusChangedListener {
+    Intent intent;
     Robot robot;
     MediaPlayer mediaPlayer;
     ImageView imageViewFace;
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     private static final int REQUEST_CAMERA = 1;
 
+    private static boolean faceDetectionComPleted = false;
     private static boolean faceDetectionOn = false;
     // Human detection
     public static final float MINIMUM_CONFIDENCE_TF_OD_API = 0.5f;
@@ -246,9 +248,11 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
     @Override
     protected void onResume() {
         super.onResume();
+
         handlerThread = new HandlerThread("mp3 player");
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper());
+        // start faceRecognition
         if(faceDetectionOn) {
             handler.post(() -> {
                 faceDetectionOn = false;
@@ -262,8 +266,36 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
                 });
             });
             Intent mIntent = new Intent(MainActivity.this, FaceRecognitionActivity.class);
-            mIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            // mIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(mIntent);
+        }
+        if(intent == null) {
+            intent = getIntent();
+        }
+
+        if(intent != null) {
+            String fRSuccess = intent.getStringExtra("faceRecognition");
+            intent.removeExtra("faceRecognition");
+            if (fRSuccess != null && fRSuccess.equals("success")) {
+                handler.post(() -> {
+                    faceDetectionComPleted = false;
+                    mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.human_detection_completed);
+                    mediaPlayer.start();
+                    mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mediaPlayer) {
+                            mediaPlayer = null;
+                        }
+                    });
+                });
+            }else if(fRSuccess != null && fRSuccess.equals("fail")){
+                UserInfo admin = robot.getAdminInfo();
+                if (admin == null) {
+                    return;
+                }
+                Log.d("startTelepresence : ","sibal");
+                robot.startTelepresence(admin.getName(), admin.getUserId());
+            }
         }
     }
 
@@ -285,6 +317,7 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
     public void onRobotReady(boolean b) {
         ArrayList<Permission> p = new ArrayList<>();
         p.add(Permission.SETTINGS);
+        robot.hideTopBar();
         robot.requestPermissions(p,1);
         // robot.requestToBeKioskApp();
         robot.toggleWakeup(true);

@@ -70,7 +70,8 @@
                            com.robotemi.permission.sequence" />
 
         <activity android:name="com.kist.kistapp1.MainActivity"
-            android:windowSoftInputMode="stateHidden|adjustPan">
+            android:windowSoftInputMode="stateHidden|adjustPan"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

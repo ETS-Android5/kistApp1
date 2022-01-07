@@ -18,6 +18,7 @@ package com.kist.Detection.faceRecognition;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
@@ -29,8 +30,14 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.hardware.camera2.CameraCharacteristics;
 import android.media.ImageReader.OnImageAvailableListener;
+import android.net.wifi.p2p.WifiP2pManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.SystemClock;
+import android.util.Log;
 import android.util.Size;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -40,6 +47,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.lifecycle.Observer;
+
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.mlkit.vision.common.InputImage;
@@ -47,7 +56,11 @@ import com.google.mlkit.vision.face.Face;
 import com.google.mlkit.vision.face.FaceDetection;
 import com.google.mlkit.vision.face.FaceDetector;
 import com.google.mlkit.vision.face.FaceDetectorOptions;
+import com.kist.Detection.faceRecognition.room.PersonalInfo;
+import com.kist.Detection.faceRecognition.room.PersonalInfoDao;
+import com.kist.Detection.faceRecognition.room.PersonalInfoDatabase;
 import com.kist.Detection.faceRecognition.tflite.SimilarityClassifier;
+import com.kist.kistapp1.MainActivity;
 import com.kist.kistapp1.R;
 
 import com.kist.Detection.customview.OverlayView;
@@ -61,6 +74,7 @@ import com.kist.Detection.faceRecognition.tracking.FaceMultiBoxTracker;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Timer;
 
 /**
  * An activity that uses a TensorFlowMultiBoxDetector and ObjectTracker to detect and then track
@@ -68,8 +82,10 @@ import java.util.List;
  */
 public class FaceRecognitionActivity extends FaceCameraActivity implements OnImageAvailableListener {
   private static final Logger LOGGER = new Logger();
+  PersonalInfoDatabase db;
 
-
+  HandlerThread handlerThread;
+  Handler handler;
   // FaceNet
 //  private static final int TF_OD_API_INPUT_SIZE = 160;
 //  private static final boolean TF_OD_API_IS_QUANTIZED = false;
@@ -150,12 +166,60 @@ public class FaceRecognitionActivity extends FaceCameraActivity implements OnIma
 
     faceDetector = FaceDetection.getClient(options);
 
-
+    db = PersonalInfoDatabase.getAppDatabase(this);
     //checkWritePermission();
 
+    /*handlerThread = new HandlerThread("Timer");
+    handlerThread.start();
+    handler = new Handler(handlerThread.getLooper());
+    handler.post(new Runnable() {
+      @Override
+      public void run() {
+        CountDownTimer timer = new CountDownTimer(10000, 10000) {
+          @Override
+          public void onTick(long l) {
+
+          }
+
+          @Override
+          public void onFinish() {
+            Intent intent = new Intent(FaceRecognitionActivity.this, MainActivity.class);
+            intent.putExtra("faceRecognition","fail");
+            // intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+          }
+        }.start();
+      }
+    });*/
+    CountDownTimer timer = new CountDownTimer(15000, 15000) {
+      @Override
+      public void onTick(long l) {
+
+      }
+
+      @Override
+      public void onFinish() {
+        Intent intent = new Intent(FaceRecognitionActivity.this, MainActivity.class);
+        intent.putExtra("faceRecognition","fail");
+        // intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+      }
+    }.start();
   }
 
+  @Override
+  public synchronized void onPause() {
+    /*handlerThread.quitSafely();
+    try {
+      handlerThread.join();
+      handlerThread = null;
+      handler = null;
+    } catch (final InterruptedException e) {
+      Log.e("e","exception!");
+    }*/
 
+    super.onPause();
+  }
 
   private void onAddClick() {
 
@@ -193,6 +257,17 @@ public class FaceRecognitionActivity extends FaceCameraActivity implements OnIma
       toast.show();
       finish();
     }
+
+    db.personalInfoDao().getAll().observe(this, new Observer<List<PersonalInfo>>() {
+      @Override
+      public void onChanged(List<PersonalInfo> personalInfos) {
+        if (personalInfos.size() != 0) {
+          for (int i = 0; i < personalInfos.size(); i++) {
+            detector.register(personalInfos.get(i).getName(), personalInfos.get(i).getRecognition());
+          }
+        }
+      }
+    });
 
     previewWidth = size.getWidth();
     previewHeight = size.getHeight();
@@ -397,6 +472,9 @@ public class FaceRecognitionActivity extends FaceCameraActivity implements OnIma
           if (name.isEmpty()) {
               return;
           }
+          // add to db
+          new InsertAsyncTask(db.personalInfoDao()).execute(new PersonalInfo(name, rec));
+
           detector.register(name, rec);
           //knownFaces.put(name, rec);
           dlg.dismiss();
@@ -527,14 +605,17 @@ public class FaceRecognitionActivity extends FaceCameraActivity implements OnIma
         final List<SimilarityClassifier.Recognition> resultsAux = detector.recognizeImage(faceBmp, add);
         lastProcessingTimeMs = SystemClock.uptimeMillis() - startTime;
         if (resultsAux.size() > 0) {
-
           SimilarityClassifier.Recognition result = resultsAux.get(0);
 
+          // 얼굴 인식이 완료되었습니다.
+          if (result.getTitle().equals("유승원")){
+            Intent mIntent = new Intent(FaceRecognitionActivity.this, MainActivity.class);
+            mIntent.putExtra("faceRecognition","success");
+            // mIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(mIntent);
+          }
+
           extra = result.getExtra();
-//          Object extra = result.getExtra();
-//          if (extra != null) {
-//            LOGGER.i("embeeding retrieved " + extra.toString());
-//          }
 
           float conf = result.getDistance();
           if (conf < 1.0f) {
@@ -590,4 +671,17 @@ public class FaceRecognitionActivity extends FaceCameraActivity implements OnIma
 
   }
 
+  public static class InsertAsyncTask extends AsyncTask<PersonalInfo, Void, Void> {
+    private final PersonalInfoDao personalInfoDao;
+
+    public InsertAsyncTask(PersonalInfoDao personalInfoDao){
+      this.personalInfoDao = personalInfoDao;
+    }
+
+    @Override
+    protected Void doInBackground(PersonalInfo... personalInfos) {
+      personalInfoDao.insert(personalInfos[0]);
+      return null;
+    }
+  }
 }
