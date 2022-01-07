@@ -82,6 +82,7 @@ import java.util.Timer;
  */
 public class FaceRecognitionActivity extends FaceCameraActivity implements OnImageAvailableListener {
   private static final Logger LOGGER = new Logger();
+  CountDownTimer timer;
   PersonalInfoDatabase db;
 
   HandlerThread handlerThread;
@@ -191,7 +192,7 @@ public class FaceRecognitionActivity extends FaceCameraActivity implements OnIma
         }.start();
       }
     });*/
-    CountDownTimer timer = new CountDownTimer(15000, 15000) {
+    timer = new CountDownTimer(15000, 15000) {
       @Override
       public void onTick(long l) {
 
@@ -200,7 +201,7 @@ public class FaceRecognitionActivity extends FaceCameraActivity implements OnIma
       @Override
       public void onFinish() {
         Intent intent = new Intent(FaceRecognitionActivity.this, MainActivity.class);
-        intent.putExtra("faceRecognition","fail");
+        intent.putExtra("faceRecognition result","fail");
         // intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
       }
@@ -217,7 +218,7 @@ public class FaceRecognitionActivity extends FaceCameraActivity implements OnIma
     } catch (final InterruptedException e) {
       Log.e("e","exception!");
     }*/
-
+    timer.cancel();
     super.onPause();
   }
 
@@ -610,7 +611,7 @@ public class FaceRecognitionActivity extends FaceCameraActivity implements OnIma
           // 얼굴 인식이 완료되었습니다.
           if (result.getTitle().equals("유승원")){
             Intent mIntent = new Intent(FaceRecognitionActivity.this, MainActivity.class);
-            mIntent.putExtra("faceRecognition","success");
+            mIntent.putExtra("faceRecognition result","success");
             // mIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(mIntent);
           }

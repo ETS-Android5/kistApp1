@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.kist.Detection.customview.OverlayView;
@@ -30,17 +31,21 @@ import com.kist.Detection.humanDetection.HumanCameraActivity;
 import com.kist.Detection.tflite.Classifier;
 import com.kist.Detection.tflite.YoloV4Classifier;
 import com.kist.Detection.humanDetection.tracking.HumanMultiBoxTracker;
+import com.kist.kistapp1.MainActivity;
 import com.kist.kistapp1.R;
 
 import com.robotemi.sdk.Robot;
+import com.robotemi.sdk.listeners.OnGoToLocationStatusChangedListener;
+import com.robotemi.sdk.listeners.OnRobotReadyListener;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 public class PatrolActivity extends PatrolCameraActivity
-        // implements OnRobotReadyListener, OnGoToLocationStatusChangedListener {
-{
+        implements OnRobotReadyListener, OnGoToLocationStatusChangedListener {
+
 
     private static final Logger LOGGER = new Logger();
 
@@ -80,7 +85,7 @@ public class PatrolActivity extends PatrolCameraActivity
 
     private static final String PERMISSION_CAMERA = Manifest.permission.CAMERA;
     private static final int PERMISSIONS_REQUEST = 1;
-    Integer index = 1;
+    Integer index = 0;
     List<String> locations;
     Robot robot;
 
@@ -89,13 +94,13 @@ public class PatrolActivity extends PatrolCameraActivity
         super.onCreate(savedInstanceState);
         // setContentView(R.layout.activity_patrol);
 
-        // robot = Robot.getInstance();
-        // robot.addOnRobotReadyListener(this);
-        // robot.addOnGoToLocationStatusChangedListener(this);
+        robot = Robot.getInstance();
+        robot.addOnRobotReadyListener(this);
+        robot.addOnGoToLocationStatusChangedListener(this);
 
     }
 
-/*    private void InitializeLocationData(){
+    private void InitializeLocationData(){
         // locations = robot.getLocations();
         locations = Arrays.asList("티비", "내 자리");
     }
@@ -107,27 +112,31 @@ public class PatrolActivity extends PatrolCameraActivity
     @Override
     public void onRobotReady(boolean b) {
         InitializeLocationData();
-        robot.goTo("티비");
+        robot.goTo(locations.get(index++));
         robot.toggleNavigationBillboard(true);
+        patrolProcess();
     }
 
     @Override
     public void onGoToLocationStatusChanged(@NonNull String s, @NonNull String s1, int i, @NonNull String s2) {
         if (index < locations.size() & s1.equals("complete")){
-            try {
+            /*try {
+                robot.setLocked(true);
                 robot.wait(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            robot.goTo(locations.get(index));
-            if (index + 1 == locations.size()){
+            robot.setLocked(false);*/
+            robot.goTo(locations.get(index++));
+            if (index <= locations.size()){
                 index = 0;
-            }else{
-                index += 1;
             }
         }
+        if(s1.equals("abort")){
+            robot.goTo(locations.get(0 <= index && index <locations.size() ? index : 0));
+        }
         Log.d("onGoToLocationStatusChanged : ","location : " + s + " / status : " + s1 + " / descriptionId : " + String.valueOf(i) + " / description : " + s2);
-    }*/
+    }
 
     @Override
     protected void processImage() {
@@ -162,15 +171,13 @@ public class PatrolActivity extends PatrolCameraActivity
                 final List<Classifier.Recognition> results = detector.recognizeImage(croppedBitmap);
                 if (results.size() >= 1){
                     // 거수자 발생 알림!!
-                    // 얼굴 인식 액티비티로 이동 -> 이거 왜 안돼 ㅠ
-                    // getFragmentManager().beginTransaction().remove(fragment).commit();
-
+                    // 얼굴 인식 액티비티로 이동
+                    robot.stopMovement();
                     getFragmentManager().beginTransaction().remove(fragment).commit();
-                    // Intent mIntent = new Intent(PatrolActivity.this, FaceRecognitionActivity.class);
-                    // mIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    // startActivity(mIntent);
-                    // Log.d("PatrolActivity : ","start FaceRecognitionActivity");
-                    finish();
+                    Intent intent = new Intent(PatrolActivity.this, MainActivity.class);
+                    intent.putExtra("start faceRecognition",true);
+                    startActivity(intent);
+                    // finish();
                 }else {
 
                     lastProcessingTimeMs = SystemClock.uptimeMillis() - startTime;

@@ -166,12 +166,7 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
 
         // 따라가기
         Button followMeBtn = (Button)findViewById(R.id.followMeBtn);
-        followMeBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                robot.beWithMe();
-            }
-        });
+        followMeBtn.setOnClickListener(view -> robot.beWithMe());
 
         // 상단바 표시
         Button showTopBarBtn = (Button) findViewById(R.id.showTopBarBtn);
@@ -187,43 +182,39 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
         stopFaceRecogBtn.setOnClickListener(view -> stopFaceRecognition());
 
         Button humanDetectionStartBtn = (Button)findViewById(R.id.humanDtStartBtn);
-        humanDetectionStartBtn.setOnClickListener(view -> startActivity(new Intent(MainActivity.this, HumanDetectorActivity.class)));
+        humanDetectionStartBtn.setOnClickListener(view -> {
+            startActivity(new Intent(MainActivity.this, HumanDetectorActivity.class));
+        });
 
-        // 순찰 기능
-        Button patrolBtn = (Button)findViewById(R.id.patrolBtn);
-        patrolBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                faceDetectionOn = true;
+                // 순찰 기능
+                Button patrolBtn = (Button) findViewById(R.id.patrolBtn);
+        patrolBtn.setOnClickListener(view -> {
+            // faceDetectionOn = true;
+            robot.setKioskModeOn(true);
+            if (robot.isKioskModeOn()) {
                 startActivity(new Intent(MainActivity.this, PatrolActivity.class));
             }
         });
 
         // 키오스크 모드 시작
         Button kioskBtn = (Button)findViewById(R.id.kioskBtn);
-        kioskBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                robot.requestToBeKioskApp();
-                ArrayList<Permission> p = new ArrayList<>();
-                p.add(Permission.SETTINGS);
-                robot.requestPermissions(p,1);
-                robot.toggleWakeup(true);
-            }
+        kioskBtn.setOnClickListener(view -> {
+            robot.requestToBeKioskApp();
+            ArrayList<Permission> p = new ArrayList<>();
+            p.add(Permission.SETTINGS);
+            robot.requestPermissions(p,1);
+            robot.toggleWakeup(true);
         });
 
         // 앱 전환
         Button changeAppBtn = (Button)findViewById(R.id.changeAppBtn);
-        changeAppBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent receiveIntent = new Intent("com.kist.kistapp2.action.APP_SIGNAL");
-                receiveIntent.putExtra("kistAppIsDead",true);
-                sendBroadcast(receiveIntent);
-                Intent intent = getPackageManager().getLaunchIntentForPackage("com.kist.kistapp2");
-                startActivity(intent);
-                finish();
-            }
+        changeAppBtn.setOnClickListener(view -> {
+            Intent receiveIntent = new Intent("com.kist.kistapp2.action.APP_SIGNAL");
+            receiveIntent.putExtra("kistAppIsDead",true);
+            sendBroadcast(receiveIntent);
+            Intent intent = getPackageManager().getLaunchIntentForPackage("com.kist.kistapp2");
+            startActivity(intent);
+            finish();
         });
     }
 
@@ -249,11 +240,17 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
     protected void onResume() {
         super.onResume();
 
+        intent = getIntent();
+
+        boolean startFaceRecognition = intent.getBooleanExtra("start faceRecognition",false);
+        String faceRecognitionResult = intent.getStringExtra("faceRecognition result");
+
         handlerThread = new HandlerThread("mp3 player");
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper());
-        // start faceRecognition
-        if(faceDetectionOn) {
+        if(startFaceRecognition) {
+            getIntent().removeExtra("start faceRecognition");
+            // start faceRecognition
             handler.post(() -> {
                 faceDetectionOn = false;
                 mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.human_detection);
@@ -265,35 +262,24 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
                     }
                 });
             });
+            robot.setKioskModeOn(false);
             Intent mIntent = new Intent(MainActivity.this, FaceRecognitionActivity.class);
             // mIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(mIntent);
-        }
-        if(intent == null) {
-            intent = getIntent();
-        }
-
-        if(intent != null) {
-            String fRSuccess = intent.getStringExtra("faceRecognition");
-            intent.removeExtra("faceRecognition");
-            if (fRSuccess != null && fRSuccess.equals("success")) {
+        }else if(faceRecognitionResult != null){
+            getIntent().removeExtra("faceRecognition result");
+            if(faceRecognitionResult.equals("success")) {
                 handler.post(() -> {
                     faceDetectionComPleted = false;
                     mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.human_detection_completed);
                     mediaPlayer.start();
-                    mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                        @Override
-                        public void onCompletion(MediaPlayer mediaPlayer) {
-                            mediaPlayer = null;
-                        }
-                    });
+                    mediaPlayer.setOnCompletionListener(mediaPlayer -> mediaPlayer = null);
                 });
-            }else if(fRSuccess != null && fRSuccess.equals("fail")){
+            }else if(faceRecognitionResult.equals("fail")){
                 UserInfo admin = robot.getAdminInfo();
                 if (admin == null) {
                     return;
                 }
-                Log.d("startTelepresence : ","sibal");
                 robot.startTelepresence(admin.getName(), admin.getUserId());
             }
         }
@@ -301,15 +287,16 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
 
     @Override
     protected void onPause() {
-        handlerThread.quitSafely();
-        try {
-            handlerThread.join();
-            handlerThread = null;
-            handler = null;
-        } catch (final InterruptedException e) {
-            Log.e("e","exception!");
+        if(handlerThread != null) {
+            handlerThread.quitSafely();
+            try {
+                handlerThread.join();
+                handlerThread = null;
+                handler = null;
+            } catch (final InterruptedException e) {
+                Log.e("e", "exception!");
+            }
         }
-
         super.onPause();
     }
 
