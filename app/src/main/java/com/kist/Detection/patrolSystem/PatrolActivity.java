@@ -102,7 +102,7 @@ public class PatrolActivity extends PatrolCameraActivity
 
     private void InitializeLocationData(){
         // locations = robot.getLocations();
-        locations = Arrays.asList("티비", "내 자리");
+        locations = Arrays.asList("티비", "내자리");
     }
 
     private void patrolProcess(){
@@ -119,7 +119,7 @@ public class PatrolActivity extends PatrolCameraActivity
 
     @Override
     public void onGoToLocationStatusChanged(@NonNull String s, @NonNull String s1, int i, @NonNull String s2) {
-        if (index < locations.size() & s1.equals("complete")){
+        if (index < locations.size() && s1.equals("complete")){
             /*try {
                 robot.setLocked(true);
                 robot.wait(1000);
@@ -127,14 +127,15 @@ public class PatrolActivity extends PatrolCameraActivity
                 e.printStackTrace();
             }
             robot.setLocked(false);*/
-            robot.goTo(locations.get(index++));
-            if (index <= locations.size()){
+            index += 1;
+            if (index >= locations.size()){
                 index = 0;
             }
+            robot.goTo(locations.get(index));
         }
-        if(s1.equals("abort")){
-            robot.goTo(locations.get(0 <= index && index <locations.size() ? index : 0));
-        }
+        /*if(s1.equals("abort")){
+            robot.goTo(locations.get(0 <= index && index < locations.size() ? index : 0));
+        }*/
         Log.d("onGoToLocationStatusChanged : ","location : " + s + " / status : " + s1 + " / descriptionId : " + String.valueOf(i) + " / description : " + s2);
     }
 
@@ -173,6 +174,7 @@ public class PatrolActivity extends PatrolCameraActivity
                     // 거수자 발생 알림!!
                     // 얼굴 인식 액티비티로 이동
                     robot.stopMovement();
+                    robot.removeOnGoToLocationStatusChangedListener(PatrolActivity.this);
                     getFragmentManager().beginTransaction().remove(fragment).commit();
                     Intent intent = new Intent(PatrolActivity.this, MainActivity.class);
                     intent.putExtra("start faceRecognition",true);
@@ -285,6 +287,12 @@ public class PatrolActivity extends PatrolCameraActivity
                 });
 
         tracker.setFrameConfiguration(previewWidth, previewHeight, sensorOrientation);
+    }
+
+    @Override
+    public synchronized void onPause() {
+        robot.stopMovement();
+        super.onPause();
     }
 
     @Override
