@@ -105,37 +105,22 @@ public class PatrolActivity extends PatrolCameraActivity
         locations = Arrays.asList("티비", "내자리");
     }
 
-    private void patrolProcess(){
-
-    }
-
     @Override
     public void onRobotReady(boolean b) {
         InitializeLocationData();
         robot.goTo(locations.get(index++));
         robot.toggleNavigationBillboard(true);
-        patrolProcess();
     }
 
     @Override
     public void onGoToLocationStatusChanged(@NonNull String s, @NonNull String s1, int i, @NonNull String s2) {
         if (index < locations.size() && s1.equals("complete")){
-            /*try {
-                robot.setLocked(true);
-                robot.wait(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            robot.setLocked(false);*/
             index += 1;
             if (index >= locations.size()){
                 index = 0;
             }
             robot.goTo(locations.get(index));
         }
-        /*if(s1.equals("abort")){
-            robot.goTo(locations.get(0 <= index && index < locations.size() ? index : 0));
-        }*/
         Log.d("onGoToLocationStatusChanged : ","location : " + s + " / status : " + s1 + " / descriptionId : " + String.valueOf(i) + " / description : " + s2);
     }
 

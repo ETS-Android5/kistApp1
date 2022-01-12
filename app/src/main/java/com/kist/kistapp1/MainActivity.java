@@ -192,7 +192,8 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
             // faceDetectionOn = true;
             robot.setKioskModeOn(true);
             if (robot.isKioskModeOn()) {
-                startActivity(new Intent(MainActivity.this, PatrolActivity.class));
+                // startActivity(new Intent(MainActivity.this, PatrolActivity.class));
+                startActivity(new Intent(MainActivity.this, TemiPatrolActivity.class));
             }
         });
 
