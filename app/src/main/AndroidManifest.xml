@@ -86,7 +86,9 @@
         </activity>
 
         <activity android:name=".TemiPatrolActivity"/>
-        <activity android:name="com.kist.Detection.patrolSystem.PatrolActivity"/>
+        <activity android:name="com.kist.Detection.patrolSystem.PatrolActivity"
+            android:screenOrientation="landscape">
+        </activity>
         <activity android:name="com.kist.Detection.faceRecognition.FaceRecognitionActivity"/>
     </application>
 

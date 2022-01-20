@@ -609,7 +609,7 @@ public class FaceRecognitionActivity extends FaceCameraActivity implements OnIma
           SimilarityClassifier.Recognition result = resultsAux.get(0);
 
           // 얼굴 인식이 완료되었습니다.
-          if (result.getTitle().equals("유승원")){
+          if (result.getTitle().equals("유승원") && result.getDistance() < 1.0f){
             Intent mIntent = new Intent(FaceRecognitionActivity.this, MainActivity.class);
             mIntent.putExtra("faceRecognition result","success");
             // mIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -186,14 +186,23 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
             startActivity(new Intent(MainActivity.this, HumanDetectorActivity.class));
         });
 
-                // 순찰 기능
-                Button patrolBtn = (Button) findViewById(R.id.patrolBtn);
+        // 순찰 기능
+        Button patrolBtn = (Button) findViewById(R.id.patrolBtn);
         patrolBtn.setOnClickListener(view -> {
             // faceDetectionOn = true;
             robot.setKioskModeOn(true);
             if (robot.isKioskModeOn()) {
                 // startActivity(new Intent(MainActivity.this, PatrolActivity.class));
                 startActivity(new Intent(MainActivity.this, TemiPatrolActivity.class));
+            }
+        });
+
+        // 얼굴 인식 모듈 테스트용 버튼
+        Button myFaceRecognitionBtn = (Button) findViewById(R.id.myFaceRecognitionBtn);
+        myFaceRecognitionBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, FaceRecognitionActivity.class));
             }
         });
 
