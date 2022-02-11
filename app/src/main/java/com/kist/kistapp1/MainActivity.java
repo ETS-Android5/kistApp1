@@ -120,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initMP3Player();
         InitTemi();
 
         // 퍼미션 확인
@@ -133,6 +134,12 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
             MediaPlayer.create(MainActivity.this, R.raw.needtocheckinternetstate).start();
             finish();
         }
+    }
+
+    protected  void initMP3Player() {
+        handlerThread = new HandlerThread("mp3 player");
+        handlerThread.start();
+        handler = new Handler(handlerThread.getLooper());
     }
 
     protected boolean isConnectedInternet() {
@@ -192,7 +199,12 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
             // faceDetectionOn = true;
             robot.setKioskModeOn(true);
             if (robot.isKioskModeOn()) {
-                // startActivity(new Intent(MainActivity.this, PatrolActivity.class));
+                handler.post(() -> {
+                    faceDetectionComPleted = false;
+                    mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.patrol_start);
+                    mediaPlayer.start();
+                    mediaPlayer.setOnCompletionListener(mediaPlayer -> mediaPlayer = null);
+                });
                 startActivity(new Intent(MainActivity.this, TemiPatrolActivity.class));
             }
         });
@@ -250,14 +262,13 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
     protected void onResume() {
         super.onResume();
 
+        initMP3Player();
+
         intent = getIntent();
 
         boolean startFaceRecognition = intent.getBooleanExtra("start faceRecognition",false);
         String faceRecognitionResult = intent.getStringExtra("faceRecognition result");
 
-        handlerThread = new HandlerThread("mp3 player");
-        handlerThread.start();
-        handler = new Handler(handlerThread.getLooper());
         if(startFaceRecognition) {
             getIntent().removeExtra("start faceRecognition");
             // start faceRecognition
@@ -281,16 +292,21 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
             if(faceRecognitionResult.equals("success")) {
                 handler.post(() -> {
                     faceDetectionComPleted = false;
-                    mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.human_detection_completed);
+                    mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.completed);
                     mediaPlayer.start();
                     mediaPlayer.setOnCompletionListener(mediaPlayer -> mediaPlayer = null);
                 });
             }else if(faceRecognitionResult.equals("fail")){
-                UserInfo admin = robot.getAdminInfo();
+                handler.post(() -> {
+                    mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.unknown_detected);
+                    mediaPlayer.start();
+                    mediaPlayer.setOnCompletionListener(mediaPlayer -> mediaPlayer = null);
+                });
+                /*UserInfo admin = robot.getAdminInfo();
                 if (admin == null) {
                     return;
                 }
-                robot.startTelepresence(admin.getName(), admin.getUserId());
+                robot.startTelepresence(admin.getName(), admin.getUserId());*/
             }
         }
     }

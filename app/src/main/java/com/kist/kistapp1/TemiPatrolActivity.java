@@ -34,7 +34,7 @@ public class TemiPatrolActivity extends AppCompatActivity implements OnRobotRead
 
     private void InitializeLocationData(){
         // locations = robot.getLocations();
-        locations = Arrays.asList("티비", "내자리");
+        locations = Arrays.asList("리빙랩", "8222");
     }
 
     @Override
@@ -42,6 +42,7 @@ public class TemiPatrolActivity extends AppCompatActivity implements OnRobotRead
         // human body is detected
         if (i == 2){
             robot.stopMovement();
+            robot.tiltAngle(55);
             Intent intent = new Intent(TemiPatrolActivity.this, MainActivity.class);
             intent.putExtra("start faceRecognition",true);
             startActivity(intent);
